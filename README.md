@@ -20,3 +20,9 @@
 1. Получи бесплатный API-ключ на [openweathermap.org](https://openweathermap.org/api) (ВРЕМЕННО ПОТОМ БУДЕТ ВШИТ В КОД)
 2. Открой `skycastUlich.html` в браузере
 3. Введи API-ключ в разделе **Настройки**
+
+
+
+## Демо сайта
+
+[Открыть Skycast](https://visnionus.github.io/skycast/)
