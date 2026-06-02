@@ -35,4 +35,4 @@
  
 ## Демо сайта
 
-[Открыть Skycast](https://visnionus.github.io/skycast/)
+[Открыть Skycast](https://visnionus.github.io/skycast/index.html)
