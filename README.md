@@ -21,6 +21,8 @@
 2. Открой `skycastUlich.html` в браузере
 3. Введи API-ключ в разделе **Настройки**
 
-## Автор
 
-Александр И.
+
+## Демо сайта
+
+[Открыть Skycast](https://visnionus.github.io/skycast/)
