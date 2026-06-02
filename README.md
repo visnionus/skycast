@@ -21,8 +21,18 @@
 2. Открой `skycastUlich.html` в браузере
 3. Введи API-ключ в разделе **Настройки**
 
+## Использованные агенты
+- Claude
+- ChatGPT
+## Что использовалось для дизайна?
+  ### Проектирование:
+  - Figma
+  ### Концепт дизайна:
+  - Yandex Weather
+  - Apple Weather
 
-
+## [Открыть фигму](https://www.figma.com/design/uNVTkBYzeAwRznvCfishuA/Weather-Web-MobWeb-app?node-id=0-1&t=Vkpvhy4GDTrM0FwG-1)
+ 
 ## Демо сайта
 
 [Открыть Skycast](https://visnionus.github.io/skycast/)
