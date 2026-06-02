@@ -17,7 +17,7 @@
 
 ## Запуск
 
-1. Получи бесплатный API-ключ на [openweathermap.org](https://openweathermap.org/api) (ВРЕМЕННО ПОТОМ БУДЕТ ВШИТ В КОД)
+1. Получи бесплатный API-ключ на [openweathermap.org](https://openweathermap.org/api) (ВРЕМЕННО, ПОТОМ БУДЕТ ВШИТ В КОД)
 2. Открой `index.html` в браузере
 3. Введи API-ключ в разделе **Настройки** (временный API-ключ 4c8a6557ca4a9362c4802beb4d4b633c)
 
