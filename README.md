@@ -1,38 +1,58 @@
-# Skycast 🌤️
+# Skycast
 
-Веб-приложение для просмотра погоды в городах России с дашбордом, почасовым и недельным прогнозом.
+Погодное веб-приложение с авторизацией пользователей.
+
+**Стек:** FastAPI + SQLite (бэкенд), HTML/CSS/JS (фронтенд), OpenWeatherMap API.
 
 ## Возможности
 
-- Текущая погода: температура, влажность, ветер, давление, видимость
-- Почасовой прогноз на день
-- Прогноз на 5 дней вперёд
-- Несколько городов: Москва, Санкт-Петербург, Сочи, Казань, Екатеринбург
-- Тёмный интерфейс в стиле дашборда
+- Регистрация и вход (JWT-токены, пароли хранятся в виде bcrypt-хэша)
+- Автоопределение домашнего города через геолокацию браузера
+- Текущая погода и прогноз на 5 дней
+- Добавление/удаление городов через поиск
+- Настройки: единицы измерения (°C/°F), формат времени, уведомления
+- Кэширование запросов к OpenWeatherMap в SQLite
 
-## Технологии
+## Установка
 
-- HTML / CSS / Vanilla JavaScript
-- OpenWeatherMap API
+```bash
+git clone <ссылка на этот репозиторий>
+cd skycast-backend
+pip install -r requirements.txt
+```
+
+Скопируй `.env.example` в `.env` и впиши свои ключи:
+
+```bash
+cp .env.example .env
+```
+
+```dotenv
+OWM_API_KEY=твой_ключ_с_openweathermap.org
+SECRET_KEY=любая_случайная_строка
+```
+
+Сгенерировать `SECRET_KEY`:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
 
 ## Запуск
 
-1. Получи бесплатный API-ключ на [openweathermap.org](https://openweathermap.org/api) (ВРЕМЕННО ПОТОМ БУДЕТ ВШИТ В КОД)
-2. Открой `skycastUlich.html` в браузере
-3. Введи API-ключ в разделе **Настройки**
+```bash
+python -m uvicorn main:app --reload
+```
 
-## Использованные агенты
-- Claude
-- ChatGPT
-## Что использовалось для дизайна?
-  ### Проектирование:
-  - Figma
-  ### Концепт дизайна:
-  - Yandex Weather
-  - Apple Weather
+Открой **http://localhost:8000**
 
-## [Открыть фигму](https://www.figma.com/design/uNVTkBYzeAwRznvCfishuA/Weather-Web-MobWeb-app?node-id=0-1&t=Vkpvhy4GDTrM0FwG-1)
- 
-## Демо сайта
+## Структура проекта
 
-[Открыть Skycast](https://visnionus.github.io/skycast/)
+```
+main.py        — все маршруты API (авторизация, погода, города, настройки)
+models.py      — таблицы базы данных (SQLAlchemy)
+schemas.py     — схемы запросов/ответов API (Pydantic)
+auth.py        — хэширование паролей и JWT-токены
+database.py    — подключение к SQLite
+config.py      — настройки из .env
+static/        — фронтенд (index.html)
+```
