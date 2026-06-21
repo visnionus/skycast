@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skycast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080f1c;--sb:#0b1525;--card:#14253a;--hero:#122040;
+  --hov:#0f1f30;--bdr:#18293d;--bdc:#1e2d42;--bdh:#1e3354;
+  --acc:#2d6dc7;--acb:#1d4e8a;--acl:#7ab3e8;--ico:#3d6fa8;
+  --tp:#e8f0fa;--ts:#8ba4c0;--tm:#5a7a9a;--td:#4d6a84;--tdd:#3d5a74;
+  --wh:#ffffff;--inn:#0f1e30;
+}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:radial-gradient(circle at 18% 12%,#0e1c33 0%,var(--bg) 55%);color:var(--tp);display:flex;height:100vh;overflow:hidden}
+
+.icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon svg,.ic svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ ANIMATIONS ============ */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(50px)}}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+.pan.act{animation:fadeSlideIn .35s ease}
+
+/* SIDEBAR */
+.sb{width:210px;min-width:210px;background:var(--sb);border-right:.5px solid var(--bdr);display:flex;flex-direction:column;padding:22px 0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;padding:0 18px 26px}
+.logo-i{width:32px;height:32px;background:var(--acb);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--acl);font-size:18px;animation:floatY 5s ease-in-out infinite}
+.logo-t{font-size:15px;font-weight:500;color:var(--tp)}
+.nav-sec{font-size:10px;color:var(--tdd);letter-spacing:1px;text-transform:uppercase;padding:0 18px;margin-bottom:6px}
+.nav-i{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:var(--tm);cursor:pointer;border-right:2px solid transparent;user-select:none;transition:background .15s,color .15s,padding-left .15s}
+.nav-i:hover{color:var(--ts);background:var(--hov);padding-left:22px}
+.nav-i.act{color:var(--acl);background:var(--hov);border-right-color:var(--acc)}
+.nav-i .ic{font-size:17px}
+.nav-cit{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px 18px;font-size:13px;color:var(--tm);cursor:pointer;border-right:2px solid transparent;transition:background .15s,color .15s}
+.nav-cit:hover{color:var(--ts);background:var(--hov)}
+.nav-cit.act{color:var(--acl);background:var(--hov);border-right-color:var(--acc)}
+.nav-cl{display:flex;align-items:center;gap:10px}
+.chev{transition:transform .2s;color:var(--td)}
+.chev.op{transform:rotate(180deg)}
+.cdd{overflow:hidden;max-height:0;transition:max-height .25s ease}
+.cdd.op{max-height:300px}
+.copt{padding:8px 18px 8px 44px;font-size:12px;color:var(--td);cursor:pointer;display:flex;justify-content:space-between;transition:color .15s,background .15s}
+.copt:hover{color:var(--ts);background:var(--hov)}
+.copt.sel{color:var(--acl)}
+.ct{color:var(--ico)}
+.sb-bot{margin-top:auto;padding:16px 18px 0;border-top:.5px solid var(--bdr)}
+.uro{display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:8px;padding:6px;margin:-6px;transition:background .15s}
+.uro:hover{background:var(--hov)}
+.av{width:30px;height:30px;border-radius:50%;background:#1d3a5c;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--acl);flex-shrink:0}
+.un{font-size:12px;color:var(--td);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uem{font-size:11px;color:var(--tdd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:54px;background:var(--sb);border-bottom:.5px solid var(--bdr);display:flex;align-items:center;padding:0 24px;flex-shrink:0}
+.tb-t{font-size:15px;font-weight:500;color:var(--tp)}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-d{font-size:12px;color:var(--td)}
+.ibtn{width:32px;height:32px;border-radius:8px;background:var(--card);border:.5px solid var(--bdc);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tm);font-size:16px;transition:background .15s,transform .15s}
+.ibtn:hover{background:var(--hov);transform:translateY(-1px)}
+.ibtn:active{transform:scale(.94)}
+
+/* PANELS */
+.pan{display:none;flex:1;overflow-y:auto;padding:22px;flex-direction:column;gap:18px}
+.pan.act{display:flex}
+.pan::-webkit-scrollbar{width:5px}
+.pan::-webkit-scrollbar-thumb{background:var(--bdc);border-radius:3px}
+
+/* HERO */
+.hc{background:linear-gradient(135deg,var(--hero),#17folder 0%,#16315c,var(--hero));background:linear-gradient(135deg,var(--hero),#16315c,#0f1e3a,var(--hero));background-size:300% 300%;animation:gradientMove 16s ease infinite;border-radius:14px;border:.5px solid var(--bdh);padding:26px 28px;position:relative;overflow:hidden;display:flex;gap:24px;align-items:stretch}
+.hbg{position:absolute;right:-10px;top:-10px;font-size:130px;color:#1a3355;line-height:1;pointer-events:none;z-index:0;animation:floatY 6s ease-in-out infinite}
+.hl{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;flex:1}
+.loc{font-size:11px;color:var(--td);display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.cn{font-size:20px;font-weight:500;color:var(--tp);margin-bottom:8px}
+.tb{font-size:64px;font-weight:300;color:var(--wh);line-height:1;letter-spacing:-3px}
+.tb sup{font-size:26px;font-weight:300;vertical-align:super;letter-spacing:0}
+.co{font-size:13px;color:var(--ts);margin-top:6px}
+.fe{font-size:11px;color:var(--td);margin-top:2px}
+.hr2{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-self:flex-end}
+.met{background:rgba(15,30,48,.85);border-radius:10px;border:.5px solid var(--bdc);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:110px;transition:transform .2s ease,box-shadow .2s ease}
+.met:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.met .ic{font-size:18px;color:var(--ico);margin-bottom:2px}
+.mv{font-size:16px;font-weight:500;color:var(--tp)}
+.ml{font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.5px}
+
+/* HOURLY */
+.sl{font-size:11px;color:var(--td);margin-bottom:10px}
+.hou{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.hou::-webkit-scrollbar{height:4px}
+.hou::-webkit-scrollbar-thumb{background:var(--bdc);border-radius:2px}
+.hp{flex-shrink:0;background:var(--card);border-radius:10px;border:.5px solid var(--bdc);padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:72px;transition:transform .2s ease,box-shadow .2s ease,border-color .15s}
+.hp:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.3);border-color:var(--acc)}
+.hp.a{background:var(--acb);border-color:var(--acc)}
+.ht{font-size:11px;color:var(--td)}
+.hp.a .ht{color:var(--acl)}
+.hi{font-size:18px;color:var(--ico)}
+.hp.a .hi{color:var(--acl)}
+.htt{font-size:13px;font-weight:500;color:var(--tp)}
+
+/* WEEK */
+.wg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wc{background:var(--card);border-radius:10px;border:.5px solid var(--bdc);padding:10px 14px;display:flex;align-items:center;gap:10px;transition:transform .2s ease,box-shadow .2s ease,border-color .15s}
+.wc:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3);border-color:var(--acc)}
+.wd{font-size:12px;color:var(--ts);width:56px;flex-shrink:0}
+.wi{font-size:16px;color:var(--ico);flex-shrink:0}
+.wdd{font-size:11px;color:var(--td);flex:1}
+.wbw{width:50px;height:3px;background:#1a2a3a;border-radius:2px;flex-shrink:0;overflow:hidden}
+.wb{height:100%;border-radius:2px;background:var(--acc);transition:width .6s ease}
+.wr{font-size:12px;display:flex;gap:4px;flex-shrink:0}
+.wlo{color:var(--td)}
+.whi{color:var(--tp);font-weight:500}
+
+/* FORECAST */
+.ft{font-size:15px;color:var(--tp);font-weight:400;margin-bottom:4px}
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fc{background:var(--card);border-radius:12px;border:.5px solid var(--bdc);padding:18px;display:flex;flex-direction:column;gap:6px;transition:transform .2s ease,box-shadow .2s ease,border-color .15s}
+.fc:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(0,0,0,.35);border-color:var(--acc)}
+.fday{font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.6px}
+.fic{font-size:28px;color:var(--ico);margin:4px 0;display:inline-block}
+.fc:hover .fic{animation:floatY 1.6s ease-in-out infinite}
+.fds{font-size:12px;color:var(--ts)}
+.fte{font-size:36px;font-weight:300;color:var(--wh);letter-spacing:-1px}
+.fte sup{font-size:18px;vertical-align:super;font-weight:300}
+.frg{font-size:11px;color:var(--td)}
+.fdt{display:flex;gap:12px;margin-top:4px}
+.fd{font-size:11px;color:var(--td);display:flex;align-items:center;gap:3px}
+.fd .ic{font-size:13px;color:var(--ico)}
+
+/* CITIES */
+.ctt{font-size:13px;color:var(--td);margin-bottom:10px}
+.cl{display:flex;flex-direction:column;gap:8px}
+.cc{background:var(--card);border-radius:10px;border:.5px solid var(--bdc);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s,background .15s,transform .2s ease,box-shadow .2s ease}
+.cc:hover{border-color:var(--acc);background:#162030;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.ci{flex:1}
+.cn2{font-size:15px;font-weight:500;color:var(--tp)}
+.cc2{font-size:12px;color:var(--td);margin-top:2px}
+.cr{display:flex;align-items:center;gap:12px}
+.cbg{font-size:11px;background:var(--acb);color:var(--acl);border-radius:20px;padding:3px 10px}
+.cci{font-size:22px;color:var(--ico)}
+.cte{font-size:22px;font-weight:300;color:var(--wh)}
+.del-city{font-size:15px;color:var(--td);cursor:pointer;transition:color .15s,transform .15s;padding:4px}
+.del-city:hover{color:#d6736f;transform:scale(1.15)}
+
+/* SETTINGS */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sb2{background:var(--card);border-radius:12px;border:.5px solid var(--bdc);overflow:hidden;transition:border-color .15s,transform .2s ease}
+.sbt{font-size:10px;color:var(--td);text-transform:uppercase;letter-spacing:.8px;padding:14px 18px 10px;border-bottom:.5px solid #1a2a3a}
+.sr{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:.5px solid #1a2a3a;transition:background .15s}
+.sr:last-child{border-bottom:none}
+.si{font-size:18px;color:var(--ico);flex-shrink:0}
+.sif{flex:1}
+.sn{font-size:13px;color:var(--tp)}
+.ss{font-size:11px;color:var(--td);margin-top:2px}
+.sv{font-size:13px;color:var(--ts);flex-shrink:0;font-weight:500}
+.tog{width:36px;height:20px;border-radius:10px;background:var(--acb);position:relative;flex-shrink:0;cursor:pointer;transition:background .2s}
+.tog::after{content:'';position:absolute;width:14px;height:14px;background:var(--acl);border-radius:50%;top:3px;right:3px;transition:all .2s}
+.tog.off{background:#1a2a3a}
+.tog.off::after{right:auto;left:3px;background:#3d5a74}
+.seg{display:flex;background:var(--inn);border-radius:8px;overflow:hidden;border:.5px solid var(--bdc);flex-shrink:0}
+.seg-opt{padding:6px 13px;font-size:12px;color:var(--td);cursor:pointer;transition:background .15s,color .15s}
+.seg-opt:hover{color:var(--ts)}
+.seg-opt.on{background:var(--acb);color:var(--acl)}
+.logout-row{cursor:pointer}
+.logout-row:hover{background:var(--hov)}
+
+/* GENERIC */
+.ldr{display:flex;align-items:center;justify-content:center;height:120px;color:var(--td);font-size:13px;gap:8px}
+.spin{display:inline-block;animation:spin 1s linear infinite}
+.er{background:#1a0f0f;border:.5px solid #3a1a1a;border-radius:10px;padding:12px 16px;font-size:13px;color:#cf8a8a;display:flex;align-items:center;gap:8px}
+.ir{display:flex;gap:10px;margin-top:10px}
+.ai{flex:1;background:var(--inn);border:.5px solid var(--bdc);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--tp);font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.ai:focus{border-color:var(--acc)}
+.btn{background:var(--acb);border:none;border-radius:8px;padding:10px 20px;font-size:13px;color:var(--acl);cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:#245fa8}
+.btn:active{transform:scale(.97)}
+.addcity-box{margin-top:6px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.searchres{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.searchres .copt{padding:9px 8px;border-radius:6px}
+
+/* ============ AUTH OVERLAY ============ */
+.auth-ov{position:fixed;inset:0;background:rgba(4,8,16,.88);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px)}
+.auth-card{background:var(--hero);border:.5px solid var(--bdh);border-radius:16px;padding:34px;width:340px;display:flex;flex-direction:column;gap:12px;animation:modalIn .4s ease;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.auth-title{font-size:18px;font-weight:500;color:var(--tp)}
+.auth-sub{font-size:12px;color:var(--td);text-align:center;margin-top:-6px;margin-bottom:6px}
+.auth-tabs{display:flex;background:var(--inn);border-radius:8px;overflow:hidden;border:.5px solid var(--bdc);margin-bottom:2px}
+.auth-tab{flex:1;text-align:center;padding:9px;font-size:13px;color:var(--td);cursor:pointer;transition:background .15s,color .15s}
+.auth-tab.on{background:var(--acb);color:var(--acl)}
+.auth-submit{width:100%;padding:11px;font-size:13px;margin-top:4px}
+
+/* ============ TOASTS ============ */
+.toasts{position:fixed;top:18px;right:18px;display:flex;flex-direction:column;gap:10px;z-index:999;max-width:300px}
+.toast{background:var(--card);border:.5px solid var(--bdh);border-radius:10px;padding:13px 16px;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:toastIn .35s ease;display:flex;gap:10px;align-items:flex-start}
+.toast .ti{font-size:18px;color:var(--ico);margin-top:1px;flex-shrink:0}
+.tt-h{font-size:13px;font-weight:500;color:var(--tp);margin-bottom:2px}
+.tt-m{font-size:12px;color:var(--ts);line-height:1.4}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH OVERLAY ============ -->
+<div class="auth-ov" id="authOv">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-i" style="width:36px;height:36px;font-size:20px;animation:floatY 5s ease-in-out infinite"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+      <span class="auth-title">Skycast</span>
+    </div>
+    <div class="auth-sub">Прогноз погоды на каждый день</div>
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tabLogin" onclick="switchTab('login')">Войти</div>
+      <div class="auth-tab" id="tabReg" onclick="switchTab('reg')">Регистрация</div>
+    </div>
+    <input class="ai" id="authEmail" type="email" placeholder="Email" autocomplete="email">
+    <input class="ai" id="authPass" type="password" placeholder="Пароль" autocomplete="current-password">
+    <div id="authErr" style="font-size:12px;color:#d6736f;display:none;margin-top:-4px;padding:0 2px"></div>
+    <button class="btn auth-submit" id="authBtn" onclick="doAuth()">Войти</button>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div class="toasts" id="toasts"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<div class="sb">
+  <div class="logo">
+    <div class="logo-i"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+    <div class="logo-t">Skycast</div>
+  </div>
+  <div class="nav-sec">Главное</div>
+  <div class="nav-i act" onclick="goPage('dashboard',this)">
+    <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Дашборд
+  </div>
+  <div class="nav-i" onclick="goPage('forecast',this)">
+    <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Прогноз
+  </div>
+  <div class="nav-cit" id="nc" onclick="togCities(this)">
+    <div class="nav-cl">
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>Города
+    </div>
+    <span class="chev" id="chv"><svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="6 9 12 15 18 9"/></svg></span>
+  </div>
+  <div class="cdd" id="cdd">
+    <div id="cddInner"></div>
+  </div>
+  <div class="nav-i" onclick="goPage('settings',this)">
+    <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Настройки
+  </div>
+  <div class="sb-bot">
+    <div class="uro" onclick="doLogout()">
+      <div class="av" id="sbAv">?</div>
+      <div style="flex:1;min-width:0">
+        <div class="un" id="sbEmail">—</div>
+        <div class="uem">Выйти</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-t" id="pt">Дашборд</div>
+    <div class="tb-r">
+      <div class="tb-d" id="td2"></div>
+      <div class="ibtn" onclick="doRefresh()" title="Обновить">
+        <span id="ri"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
+      </div>
+      <div class="ibtn" onclick="goPage('settings',null)">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="pan act" id="pan-dashboard"><div id="dbc"><div class="ldr"><span class="spin">↻</span> Загрузка...</div></div></div>
+  <div class="pan" id="pan-forecast"><div id="fcc"></div></div>
+  <div class="pan" id="pan-cities"><div id="ctc"></div></div>
+  <div class="pan" id="pan-settings"><div id="stc"></div></div>
+</div>
+
+<script>
+const API = '';  // пустой — запросы идут на тот же origin
+
+// ═══════════════════════════════
+// SVG ICONS
+// ═══════════════════════════════
+const S={
+  sun:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  cloud:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+  csun:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41"/><path d="M15.5 8.5A5 5 0 1 0 9 18h7.5a4.5 4.5 0 0 0 0-9H16"/></svg>`,
+  rain:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>`,
+  snow:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  bolt:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  wind:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>`,
+  drop:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+  eye:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  gauge:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10"/><path d="M12 6v6l4 2"/></svg>`,
+  pin:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  moon:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  drizzle:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="16" y1="19" x2="16" y2="21"/><line x1="16" y1="13" x2="16" y2="15"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="15" x2="12" y2="17"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>`,
+  plus:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  trash:`<svg viewBox="0 0 24 24" style="width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
+};
+
+const wico=c=>{const id=parseInt(c);if(id>=200&&id<300)return'bolt';if(id>=300&&id<400)return'drizzle';if(id>=500&&id<600)return'rain';if(id>=600&&id<700)return'snow';if(id>=700&&id<800)return'wind';if(id===800)return'sun';if(id===801||id===802)return'csun';return'cloud';};
+// Описание погоды ("ясно", "облачно" и т.д.) сервер уже присылает
+// по-русски (бэкенд всегда запрашивает lang=ru у OpenWeatherMap).
+// Фронту остаётся только сделать первую букву заглавной.
+const cr=d=>d?d[0].toUpperCase()+d.slice(1):'—';
+const dirs=['С','СВ','В','ЮВ','Ю','ЮЗ','З','СЗ'];
+const wdir=d=>dirs[Math.round((d||0)/45)%8];
+const ldr=()=>`<div class="ldr"><span class="spin">↻</span> Загрузка...</div>`;
+const errBox=m=>`<div class="er">⚠ ${m}</div>`;
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let TOKEN = localStorage.getItem('sc_token') || '';
+let ME = null;   // {id, email, home_city, home_lat, home_lon, settings, cities}
+let CITIES = []; // [{id, name, lat, lon, is_home}]
+let CITY = null; // текущий выбранный {name, lat, lon}
+let page = 'dashboard', citOpen = false;
+const cache = {};
+
+const D=new Date(),DN=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],MN=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+document.getElementById('td2').textContent=`${DN[D.getDay()]}, ${D.getDate()} ${MN[D.getMonth()]} ${D.getFullYear()}`;
+
+// ═══════════════════════════════
+// API helpers
+// ═══════════════════════════════
+async function apiFetch(path, opts={}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...(TOKEN ? {'Authorization':'Bearer '+TOKEN} : {}) },
+    ...opts,
+  });
+  if (res.status === 401) { doLogout(); return null; }
+  return res;
+}
+
+async function getWeather(lat, lon) {
+  const key = `w${lat.toFixed(2)}_${lon.toFixed(2)}_${ME?.settings?.units}`;
+  if (cache[key]) return cache[key];
+  const r = await apiFetch(`/weather/current?lat=${lat}&lon=${lon}`);
+  if (!r || !r.ok) return null;
+  const d = await r.json();
+  cache[key] = d; return d;
+}
+
+async function getForecast(lat, lon) {
+  const key = `f${lat.toFixed(2)}_${lon.toFixed(2)}_${ME?.settings?.units}`;
+  if (cache[key]) return cache[key];
+  const r = await apiFetch(`/weather/forecast?lat=${lat}&lon=${lon}`);
+  if (!r || !r.ok) return null;
+  const d = await r.json();
+  cache[key] = d; return d;
+}
+
+// ═══════════════════════════════
+// TOASTS
+// ═══════════════════════════════
+function toast(title, msg, emoji='🌤') {
+  const box = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<div class="ti">${emoji}</div><div><div class="tt-h">${title}</div><div class="tt-m">${msg}</div></div>`;
+  box.appendChild(el);
+  setTimeout(()=>{ el.style.animation='toastOut .35s ease forwards'; setTimeout(()=>el.remove(),350); }, 4000);
+}
+
+// ═══════════════════════════════
+// AUTH
+// ═══════════════════════════════
+let authMode = 'login';
+function switchTab(m) {
+  authMode = m;
+  document.getElementById('tabLogin').classList.toggle('on', m==='login');
+  document.getElementById('tabReg').classList.toggle('on', m==='reg');
+  document.getElementById('authBtn').textContent = m==='login' ? 'Войти' : 'Создать аккаунт';
+  document.getElementById('authErr').style.display='none';
+}
+
+document.getElementById('authPass').addEventListener('keydown', e => { if (e.key==='Enter') doAuth(); });
+document.getElementById('authEmail').addEventListener('keydown', e => { if (e.key==='Enter') doAuth(); });
+
+async function doAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPass').value;
+  const errEl = document.getElementById('authErr');
+  errEl.style.display='none';
+  if (!email || !pass) { errEl.textContent='Заполните все поля'; errEl.style.display='block'; return; }
+
+  const url = authMode==='login' ? '/auth/login' : '/auth/register';
+  const r = await fetch(API + url, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({email, password: pass})
+  });
+  const d = await r.json();
+  if (!r.ok) { errEl.textContent = d.detail || 'Ошибка'; errEl.style.display='block'; return; }
+
+  TOKEN = d.access_token;
+  localStorage.setItem('sc_token', TOKEN);
+  await loadMe();
+}
+
+async function loadMe() {
+  const r = await apiFetch('/auth/me');
+  if (!r || !r.ok) return;
+  ME = await r.json();
+  CITIES = ME.cities || [];
+
+  // выбрать текущий город — сначала домашний, потом первый
+  const home = CITIES.find(c=>c.is_home) || CITIES[0] || null;
+  CITY = CITY && CITIES.find(c=>c.lat===CITY.lat&&c.lon===CITY.lon) ? CITY : home;
+
+  // Шапка
+  const em = ME.email;
+  document.getElementById('sbEmail').textContent = em;
+  document.getElementById('sbAv').textContent = em[0].toUpperCase();
+
+  // Скрыть оверлей авторизации
+  document.getElementById('authOv').style.display='none';
+
+  rebuildCitiesMenu();
+  goPage(page, document.querySelector('.nav-i.act'));
+  startNotificationPoller();
+
+  // На localhost IP не даёт реального города — поэтому если домашний
+  // город ещё не определён, спрашиваем геолокацию у самого браузера.
+  if (!ME.home_city) requestGeolocation();
+}
+
+// Спрашивает у браузера разрешение на геолокацию и сохраняет
+// полученные координаты как домашний город пользователя.
+function requestGeolocation() {
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+
+    const r = await apiFetch('/auth/set-location', {
+      method: 'POST',
+      body: JSON.stringify({ lat, lon })
+    });
+    if (!r || !r.ok) return;
+
+    ME = await r.json();
+    CITIES = ME.cities || [];
+    CITY = CITIES.find(c=>c.is_home) || CITIES[0] || null;
+
+    rebuildCitiesMenu();
+    Object.keys(cache).forEach(k=>delete cache[k]);
+    if (page==='dashboard') rDB();
+    toast('Геолокация', `Домашний город: ${ME.home_city}`, '📍');
+  }, () => {
+    // Пользователь отказал в доступе — ничего страшного,
+    // стандартные города (Москва, СПб, Казань) уже есть в списке.
+    toast('Геолокация недоступна', 'Можно добавить город вручную в разделе «Города»', '📍');
+  });
+}
+
+function doLogout() {
+  TOKEN=''; localStorage.removeItem('sc_token');
+  ME=null; CITIES=[]; CITY=null;
+  document.getElementById('authOv').style.display='flex';
+  document.getElementById('authEmail').value='';
+  document.getElementById('authPass').value='';
+  Object.keys(cache).forEach(k=>delete cache[k]);
+}
+
+// ═══════════════════════════════
+// SETTINGS helpers
+// ═══════════════════════════════
+function unitSymbol() { return ME?.settings?.units==='imperial' ? '°F' : '°C'; }
+function tempVal(c) {
+  if (ME?.settings?.units==='imperial') return Math.round(c*9/5+32);
+  return Math.round(c);
+}
+function speedVal(ms) {
+  // ms в м/с → км/ч (metric) или mph (imperial)
+  if (ME?.settings?.units==='imperial') return Math.round(ms*2.237)+' mph';
+  return Math.round(ms*3.6)+' км/ч';
+}
+function fmtHour(dt) {
+  const d = new Date(dt*1000);
+  if (ME?.settings?.time_format==='12h') {
+    let h=d.getHours(), ampm=h>=12?'PM':'AM';
+    h=h%12||12; return `${h} ${ampm}`;
+  }
+  return String(d.getHours()).padStart(2,'0')+':00';
+}
+
+async function patchSetting(key, val) {
+  const body = {}; body[key]=val;
+  const r = await apiFetch('/settings', {method:'PATCH', body:JSON.stringify(body)});
+  if (r && r.ok) { ME.settings = await r.json(); }
+}
+
+// ═══════════════════════════════
+// CITIES MENU
+// ═══════════════════════════════
+function rebuildCitiesMenu() {
+  const inner = document.getElementById('cddInner');
+  inner.innerHTML = CITIES.map(c=>`
+    <div class="copt${CITY&&c.lat===CITY.lat&&c.lon===CITY.lon?' sel':''}"
+         onclick="pickCity(${c.id})">
+      <span>${c.name}${c.is_home?' 🏠':''}</span>
+      <span class="ct" id="ot-${c.id}">—</span>
+    </div>`).join('');
+  // фоново обновить температуры
+  CITIES.forEach(c => {
+    getWeather(c.lat, c.lon).then(w=>{
+      const el=document.getElementById('ot-'+c.id);
+      if(el&&w) el.textContent=tempVal(w.main.temp)+(ME?.settings?.units==='imperial'?'°F':'°');
+    });
+  });
+}
+
+function pickCity(id) {
+  const c = CITIES.find(x=>x.id===id);
+  if (!c) return;
+  CITY = c;
+  rebuildCitiesMenu();
+  if(page==='dashboard') rDB();
+  else if(page==='forecast') rFC();
+  else if(page==='cities') rCT();
+}
+
+function togCities(el) {
+  citOpen=!citOpen;
+  document.getElementById('cdd').classList.toggle('op',citOpen);
+  document.getElementById('chv').classList.toggle('op',citOpen);
+  if(citOpen){
+    document.querySelectorAll('.nav-i,.nav-cit').forEach(n=>n.classList.remove('act'));
+    el.classList.add('act');
+    goPage('cities',null);
+  }
+}
+
+// ═══════════════════════════════
+// NAV
+// ═══════════════════════════════
+function goPage(pg, el) {
+  page=pg;
+  document.querySelectorAll('.nav-i,.nav-cit').forEach(n=>n.classList.remove('act'));
+  document.querySelectorAll('.pan').forEach(p=>p.classList.remove('act'));
+  if(el) el.classList.add('act');
+  const titles={dashboard:'Дашборд',forecast:'Прогноз',cities:'Города',settings:'Настройки'};
+  document.getElementById('pt').textContent=titles[pg]||'';
+  const pan=document.getElementById('pan-'+pg);
+  pan.classList.add('act');
+  if(!ME) return; // не рендерить без авторизации
+  if(pg==='dashboard') rDB();
+  else if(pg==='forecast') rFC();
+  else if(pg==='cities') rCT();
+  else if(pg==='settings') rST();
+}
+
+async function doRefresh() {
+  const ri=document.getElementById('ri');
+  ri.style.animation='spin 1s linear infinite';
+  Object.keys(cache).forEach(k=>delete cache[k]);
+  if(page==='dashboard') await rDB();
+  else if(page==='forecast') await rFC();
+  else if(page==='cities') await rCT();
+  ri.style.animation='';
+}
+
+// ═══════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════
+async function rDB() {
+  const el=document.getElementById('dbc');
+  if(!CITY){el.innerHTML=errBox('Нет городов. Добавьте город в разделе «Города».');return;}
+  el.innerHTML=ldr();
+  const [w,f]=await Promise.all([getWeather(CITY.lat,CITY.lon),getForecast(CITY.lat,CITY.lon)]);
+  if(!w){el.innerHTML=errBox('Не удалось загрузить данные. Проверьте соединение.');return;}
+
+  const t=tempVal(w.main.temp),fl=tempVal(w.main.feels_like);
+  const mn=tempVal(w.main.temp_min),mx=tempVal(w.main.temp_max);
+  const us=unitSymbol();
+  const desc=cr(w.weather[0].description),wi=wico(w.weather[0].id);
+  const hum=w.main.humidity,spd=speedVal(w.wind.speed),wd=wdir(w.wind.deg);
+  const vis=w.visibility?(w.visibility/1000).toFixed(0)+' км':'—',pres=Math.round(w.main.pressure);
+
+  let hou='';
+  if(f?.list){
+    const now=Date.now()/1000;
+    f.list.filter(h=>h.dt>=now-1800).slice(0,8).forEach((h,i)=>{
+      const lb=i===0?'Сейчас':fmtHour(h.dt);
+      hou+=`<div class="hp ${i===0?'a':''}"><div class="ht">${lb}</div><span class="hi">${S[wico(h.weather[0].id)]||S.cloud}</span><div class="htt">${tempVal(h.main.temp)}${us}</div></div>`;
+    });
+  }
+
+  let wk='';
+  if(f?.list){
+    const bd={},td=new Date();
+    f.list.forEach(it=>{const d2=new Date(it.dt*1000);const k=`${d2.getFullYear()}-${d2.getMonth()}-${d2.getDate()}`;if(!bd[k])bd[k]={items:[],date:d2};bd[k].items.push(it);});
+    const DN2=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+    Object.values(bd).slice(0,6).forEach(day=>{
+      const d3=day.date,isTd=d3.getDate()===td.getDate()&&d3.getMonth()===td.getMonth();
+      const lb=isTd?'Сегодня':DN2[d3.getDay()];
+      const ts=day.items.map(i=>i.main.temp);
+      const dmn=tempVal(Math.min(...ts)),dmx=tempVal(Math.max(...ts));
+      const mid=day.items[Math.floor(day.items.length/2)];
+      const di=wico(mid.weather[0].id),dd2=cr(mid.weather[0].description);
+      const bw=Math.min(100,Math.max(20,((dmx+10)/40)*100));
+      wk+=`<div class="wc"><div class="wd">${lb}</div><span class="wi">${S[di]||S.cloud}</span><div class="wdd">${dd2}</div><div class="wbw"><div class="wb" style="width:${bw}%"></div></div><div class="wr"><span class="wlo">${dmn}${us}</span><span class="whi">${dmx}${us}</span></div></div>`;
+    });
+  }
+
+  el.innerHTML=`
+  <div class="hc">
+    <span class="hbg">${S[wi]||S.sun}</span>
+    <div class="hl">
+      <div class="loc"><span style="font-size:11px">${S.pin}</span> ${CITY.is_home?'Домашний город':'Выбранный город'}</div>
+      <div class="cn">${CITY.name}</div>
+      <div class="tb">${t}<sup>${us}</sup></div>
+      <div class="co">${desc}</div>
+      <div class="fe">Ощущается как ${fl}${us}</div>
+      <div class="fe">Макс. ${mx}${us} · Мин. ${mn}${us}</div>
+    </div>
+    <div class="hr2">
+      <div class="met"><span class="ic" style="font-size:18px;color:var(--ico)">${S.drop}</span><div class="mv">${hum}%</div><div class="ml">Влажность</div></div>
+      <div class="met"><span class="ic" style="font-size:18px;color:var(--ico)">${S.wind}</span><div class="mv">${spd}</div><div class="ml">Ветер ${wd}</div></div>
+      <div class="met"><span class="ic" style="font-size:18px;color:var(--ico)">${S.eye}</span><div class="mv">${vis}</div><div class="ml">Видимость</div></div>
+      <div class="met"><span class="ic" style="font-size:18px;color:var(--ico)">${S.gauge}</span><div class="mv">${pres} гПа</div><div class="ml">Давление</div></div>
+    </div>
+  </div>
+  <div><div class="sl">Сегодня по часам</div><div class="hou">${hou||'<div style="color:var(--td);font-size:13px">Нет данных</div>'}</div></div>
+  <div><div class="sl">Ближайшие дни</div><div class="wg">${wk||'<div style="color:var(--td);font-size:13px">Нет данных</div>'}</div></div>`;
+}
+
+// ═══════════════════════════════
+// FORECAST
+// ═══════════════════════════════
+async function rFC() {
+  const el=document.getElementById('fcc');
+  if(!CITY){el.innerHTML=errBox('Нет городов.');return;}
+  el.innerHTML=ldr();
+  const f=await getForecast(CITY.lat,CITY.lon);
+  if(!f){el.innerHTML=errBox('Не удалось загрузить прогноз.');return;}
+  const us=unitSymbol(),bd={},td=new Date();
+  f.list.forEach(it=>{const d2=new Date(it.dt*1000);const k=`${d2.getFullYear()}-${d2.getMonth()}-${d2.getDate()}`;if(!bd[k])bd[k]={items:[],date:d2};bd[k].items.push(it);});
+  const DN3=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  let cards='';
+  Object.values(bd).slice(0,6).forEach(day=>{
+    const d3=day.date,isTd=d3.getDate()===td.getDate()&&d3.getMonth()===td.getMonth();
+    const lb=isTd?'СЕГОДНЯ':DN3[d3.getDay()].toUpperCase();
+    const ts=day.items.map(i=>i.main.temp),mn=tempVal(Math.min(...ts)),mx=tempVal(Math.max(...ts));
+    const rain=day.items.reduce((s,i)=>s+(i.rain?.['3h']||0),0).toFixed(1);
+    const spd2=speedVal(day.items.reduce((s,i)=>s+i.wind.speed,0)/day.items.length);
+    const mid=day.items[Math.floor(day.items.length/2)],di=wico(mid.weather[0].id),desc=cr(mid.weather[0].description);
+    cards+=`<div class="fc"><div class="fday">${lb}</div><span class="fic">${S[di]||S.cloud}</span><div class="fds">${desc}</div><div class="fte">${mx}<sup>${us}</sup></div><div class="frg">Мин. ${mn}${us} · Макс. ${mx}${us}</div><div class="fdt"><div class="fd"><span style="font-size:13px;color:var(--ico)">${S.drop}</span>${rain} мм</div><div class="fd"><span style="font-size:13px;color:var(--ico)">${S.wind}</span>${spd2}</div></div></div>`;
+  });
+  el.innerHTML=`<div class="ft">Прогноз — ${CITY.name}</div><div class="fg">${cards}</div>`;
+}
+
+// ═══════════════════════════════
+// CITIES
+// ═══════════════════════════════
+async function rCT() {
+  const el=document.getElementById('ctc');
+  el.innerHTML=ldr();
+  const ws=await Promise.all(CITIES.map(c=>getWeather(c.lat,c.lon)));
+  const us=unitSymbol();
+  let cards='';
+  CITIES.forEach((c,i)=>{
+    const w=ws[i],t=w?tempVal(w.main.temp)+us:'—',d2=w?cr(w.weather[0].description):'—',ci=w?wico(w.weather[0].id):'cloud';
+    const badge=CITY&&c.lat===CITY.lat&&c.lon===CITY.lon?`<span class="cbg">Текущее</span>`:'';
+    const homeBadge=c.is_home?`<span class="cbg" style="background:#1a3a2a;color:#6bbf8a">Домашний</span>`:'';
+    const delBtn=!c.is_home?`<span class="del-city" title="Удалить" onclick="deleteCity(event,${c.id})">${S.trash}</span>`:'';
+    cards+=`<div class="cc" onclick="pickCity(${c.id})"><div class="ci"><div class="cn2">${c.name}</div><div class="cc2">${d2}</div></div><div class="cr">${homeBadge}${badge}<span class="cci">${S[ci]||S.cloud}</span><div class="cte">${t}</div>${delBtn}</div></div>`;
+  });
+
+  el.innerHTML=`
+    <div class="ctt">Мои города</div>
+    <div class="cl">${cards}</div>
+    <div class="sb2" style="margin-top:8px">
+      <div class="sbt">Добавить город</div>
+      <div class="addcity-box">
+        <div class="ir" style="margin-top:0">
+          <input class="ai" id="citySearch" placeholder="Введите название города..." oninput="onCitySearch()">
+          <button class="btn" onclick="onCitySearch()">Найти</button>
+        </div>
+        <div class="searchres" id="cityResults"></div>
+      </div>
+    </div>`;
+}
+
+let citySearchTimer=null;
+function onCitySearch(){
+  clearTimeout(citySearchTimer);
+  citySearchTimer=setTimeout(doCitySearch,400);
+}
+
+async function doCitySearch(){
+  const q=document.getElementById('citySearch')?.value?.trim();
+  const res=document.getElementById('cityResults');
+  if(!res) return;
+  if(!q){res.innerHTML='';return;}
+  res.innerHTML=`<div style="color:var(--td);font-size:12px;padding:6px 0">Поиск...</div>`;
+  const r=await apiFetch(`/cities/search?q=${encodeURIComponent(q)}`);
+  if(!r||!r.ok){res.innerHTML='';return;}
+  const data=await r.json();
+  if(!data.length){res.innerHTML=`<div style="color:var(--td);font-size:12px;padding:6px 0">Ничего не найдено</div>`;return;}
+  res.innerHTML=data.map(c=>`
+    <div class="copt" onclick="addCity('${c.name.replace(/'/g,"\\'")}',${c.lat},${c.lon})" style="padding:10px 8px;border-radius:6px;cursor:pointer">
+      <span>${c.name}${c.state?', '+c.state:''}</span>
+      <span style="color:var(--ico)">${c.country||''}</span>
+    </div>`).join('');
+}
+
+async function addCity(name,lat,lon){
+  const r=await apiFetch('/cities',{method:'POST',body:JSON.stringify({name,lat,lon})});
+  if(!r||!r.ok){toast('Ошибка','Не удалось добавить город','⚠️');return;}
+  const c=await r.json();
+  CITIES.push(c);
+  rebuildCitiesMenu();
+  toast('Город добавлен',name,'📍');
+  rCT();
+}
+
+async function deleteCity(e,id){
+  e.stopPropagation();
+  const r=await apiFetch(`/cities/${id}`,{method:'DELETE'});
+  if(!r||!(r.ok||r.status===204)){toast('Ошибка','Не удалось удалить','⚠️');return;}
+  CITIES=CITIES.filter(c=>c.id!==id);
+  if(CITY?.id===id) CITY=CITIES.find(c=>c.is_home)||CITIES[0]||null;
+  rebuildCitiesMenu();
+  rCT();
+}
+
+// ═══════════════════════════════
+// SETTINGS
+// ═══════════════════════════════
+function rST(){
+  if(!ME) return;
+  const s=ME.settings;
+  document.getElementById('stc').innerHTML=`
+  <div class="sg">
+    <div class="sb2">
+      <div class="sbt">Единицы измерения</div>
+      <div class="sr">
+        <span class="si">${S.gauge}</span>
+        <div class="sif"><div class="sn">Температура</div><div class="ss">Градусы Цельсия или Фаренгейта</div></div>
+        <div class="seg">
+          <div class="seg-opt${s.units==='metric'?' on':''}" onclick="setSetting('units','metric')">°C</div>
+          <div class="seg-opt${s.units==='imperial'?' on':''}" onclick="setSetting('units','imperial')">°F</div>
+        </div>
+      </div>
+      <div class="sr">
+        <span class="si">${S.wind}</span>
+        <div class="sif"><div class="sn">Скорость ветра</div><div class="ss">Автоматически по единицам темп.</div></div>
+        <div class="sv">${s.units==='imperial'?'MPH':'КМ/Ч'}</div>
+      </div>
+    </div>
+    <div class="sb2">
+      <div class="sbt">Уведомления</div>
+      <div class="sr">
+        <span class="si">${S.sun}</span>
+        <div class="sif"><div class="sn">Ежечасный прогноз</div><div class="ss">Уведомление раз в час</div></div>
+        <div class="tog${s.notify_daily?'':' off'}" onclick="toggleSetting('notify_daily',this)"></div>
+      </div>
+      <div class="sr">
+        <span class="si">${S.rain}</span>
+        <div class="sif"><div class="sn">Оповещение о дожде</div><div class="ss">За ~30 минут</div></div>
+        <div class="tog${s.notify_rain?'':' off'}" onclick="toggleSetting('notify_rain',this)"></div>
+      </div>
+    </div>
+    <div class="sb2">
+      <div class="sbt">Интерфейс</div>
+      <div class="sr">
+        <span class="si">${S.sun}</span>
+        <div class="sif"><div class="sn">Формат времени</div></div>
+        <div class="seg">
+          <div class="seg-opt${s.time_format==='24h'?' on':''}" onclick="setSetting('time_format','24h')">24Ч</div>
+          <div class="seg-opt${s.time_format==='12h'?' on':''}" onclick="setSetting('time_format','12h')">12Ч</div>
+        </div>
+      </div>
+    </div>
+    <div class="sb2">
+      <div class="sbt">Аккаунт</div>
+      <div class="sr">
+        <span class="si">${S.pin}</span>
+        <div class="sif"><div class="sn">${ME.email}</div><div class="ss">Домашний город: ${ME.home_city||'не определён'}</div></div>
+      </div>
+      <div class="sr logout-row" onclick="doLogout()">
+        <span class="si">${S.moon}</span>
+        <div class="sif"><div class="sn" style="color:#d6736f">Выйти из аккаунта</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function setSetting(key, val) {
+  await patchSetting(key, val);
+  // Сбрасываем весь кэш погоды — язык/единицы поменялись
+  Object.keys(cache).forEach(k=>delete cache[k]);
+  // Перерисовываем текущую страницу
+  rST();
+  rebuildCitiesMenu();
+  if(page==='dashboard') rDB();
+  else if(page==='forecast') rFC();
+  else if(page==='cities') rCT();
+}
+
+async function toggleSetting(key, el) {
+  el.classList.toggle('off');
+  const newVal = !el.classList.contains('off');
+  await patchSetting(key, newVal);
+}
+
+// ═══════════════════════════════
+// NOTIFICATIONS POLLER
+// ═══════════════════════════════
+function startNotificationPoller(){
+  const poll=async()=>{
+    if(!TOKEN||!ME) return;
+    const r=await apiFetch('/notifications/check');
+    if(!r||!r.ok) return;
+    const d=await r.json();
+    (d.notifications||[]).forEach(n=>{
+      const em=n.type==='rain'?'🌧':'🌤';
+      toast(n.title,n.message,em);
+    });
+  };
+  poll();
+  setInterval(poll,6*60*1000); // каждые 6 минут
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+if(TOKEN) {
+  loadMe();
+} else {
+  // показываем оверлей и ждём
+}
+</script>
+</body>
+</html>

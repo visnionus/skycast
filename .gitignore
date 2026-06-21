@@ -1,0 +1,21 @@
+# Секретные ключи — НЕ заливать на GitHub
+.env
+
+# База данных (создаётся автоматически при запуске)
+skycast.db
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
